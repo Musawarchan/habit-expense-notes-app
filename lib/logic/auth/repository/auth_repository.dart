@@ -23,9 +23,28 @@ class AuthRepository {
         email: email,
         password: password,
       );
-      return credential.user;
+      final user = credential.user;
+      if (user != null) {
+        // Ensure user document exists
+        final userRef = _firestore.collection('users').doc(user.uid);
+        final snapshot = await userRef.get();
+        if (!snapshot.exists) {
+          await userRef.set({
+            'id': user.uid,
+            'email': user.email,
+            'name': user.displayName,
+            'photoUrl': user.photoURL,
+            'createdAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+            'preferences': {},
+          });
+        }
+      }
+      return user;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_mapAuthError(e));
     } catch (e) {
-      throw Exception('Failed to sign in: $e');
+      throw Exception('Sign in failed. Please try again.');
     }
   }
 
@@ -54,8 +73,10 @@ class AuthRepository {
       }
 
       return credential.user;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_mapAuthError(e));
     } catch (e) {
-      throw Exception('Failed to create account: $e');
+      throw Exception('Account creation failed. Please try again.');
     }
   }
 
@@ -73,15 +94,17 @@ class AuthRepository {
     try {
       await _firebaseAuth.signOut();
     } catch (e) {
-      throw Exception('Failed to sign out: $e');
+      throw Exception('Failed to sign out. Please try again.');
     }
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_mapAuthError(e));
     } catch (e) {
-      throw Exception('Failed to send password reset email: $e');
+      throw Exception('Failed to send password reset email.');
     }
   }
 
@@ -95,7 +118,7 @@ class AuthRepository {
         throw Exception('User data not found');
       }
     } catch (e) {
-      throw Exception('Failed to get user data: $e');
+      throw Exception('Failed to get user data.');
     }
   }
 
@@ -108,7 +131,28 @@ class AuthRepository {
         'preferences': user.preferences,
       });
     } catch (e) {
-      throw Exception('Failed to update user data: $e');
+      throw Exception('Failed to update user data.');
+    }
+  }
+
+  String _mapAuthError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'invalid-email':
+        return 'The email address is not valid.';
+      case 'user-disabled':
+        return 'This user has been disabled.';
+      case 'user-not-found':
+        return 'No user found for that email.';
+      case 'wrong-password':
+        return 'Incorrect password. Please try again.';
+      case 'email-already-in-use':
+        return 'An account already exists for that email.';
+      case 'weak-password':
+        return 'The password provided is too weak.';
+      case 'operation-not-allowed':
+        return 'Email/password accounts are not enabled.';
+      default:
+        return e.message ?? 'Authentication error. Please try again.';
     }
   }
 }

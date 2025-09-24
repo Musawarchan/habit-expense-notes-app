@@ -9,6 +9,7 @@ import '../presentation/screens/expenses/expenses_screen.dart';
 import '../presentation/screens/notes/notes_screen.dart';
 import '../presentation/screens/ai/ai_screen.dart';
 import '../presentation/screens/settings/settings_screen.dart';
+import '../presentation/screens/onboarding/onboarding_screen.dart';
 
 class AppPages {
   // Auth Pages
@@ -24,6 +25,7 @@ class AppPages {
   static const String notes = '/notes';
   static const String ai = '/ai';
   static const String settings = '/settings';
+  static const String onboarding = '/onboarding';
 
   // Page Widgets
   static Widget splashPage() => const SplashScreen();
@@ -36,4 +38,5 @@ class AppPages {
   static Widget notesPage() => const NotesScreen();
   static Widget aiPage() => const AiScreen();
   static Widget settingsPage() => const SettingsScreen();
+  static Widget onboardingPage() => const OnboardingScreen();
 }

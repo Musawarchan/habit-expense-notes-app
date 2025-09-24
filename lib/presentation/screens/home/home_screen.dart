@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/custom_widgets.dart';
@@ -68,8 +71,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class DashboardTab extends StatelessWidget {
+class DashboardTab extends StatefulWidget {
   const DashboardTab({super.key});
+
+  @override
+  State<DashboardTab> createState() => _DashboardTabState();
+}
+
+class _DashboardTabState extends State<DashboardTab> {
+  @override
+  void initState() {
+    super.initState();
+    _ensureUserHasLatestFcm();
+  }
+
+  Future<void> _ensureUserHasLatestFcm() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('device_fcm_token');
+      if (token == null || token.isEmpty) return;
+      final ref = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      await ref.set({
+        'fcmToken': token,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {

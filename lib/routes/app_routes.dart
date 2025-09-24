@@ -48,6 +48,10 @@ class AppRoutes {
         path: AppPages.settings,
         builder: (context, state) => AppPages.settingsPage(),
       ),
+      GoRoute(
+        path: AppPages.onboarding,
+        builder: (context, state) => AppPages.onboardingPage(),
+      ),
     ],
   );
 }

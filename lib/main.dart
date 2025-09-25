@@ -40,9 +40,8 @@ class SmartLifeApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (context) =>
-              AuthBloc(authRepository: AuthRepository())
-                ..add(const AuthStarted()),
+          create: (context) => AuthBloc(authRepository: AuthRepository()),
+          // ..add(const AuthStarted()),
         ),
         BlocProvider<VisibilityCubit>(
           create: (_) => VisibilityCubit(initial: true),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/custom_widgets.dart';
 import '../../../../routes/app_pages.dart';
+import '../../../../logic/auth/bloc/auth_bloc.dart';
+import '../../../../logic/auth/bloc/auth_event.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -316,7 +319,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              context.go('/login');
+              context.read<AuthBloc>().add(const AuthLogoutRequested());
+              context.go(AppPages.login);
             },
             child: const Text('Logout'),
           ),

@@ -23,6 +23,7 @@ class SplashCubit extends Cubit<SplashState> {
   SplashCubit() : super(const SplashState());
 
   Future<void> initialize() async {
+    final startAt = DateTime.now();
     try {
       // permissions best-effort
       try {
@@ -38,6 +39,7 @@ class SplashCubit extends Cubit<SplashState> {
       final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
 
       if (!hasSeenOnboarding) {
+        await _ensureMinimumSplashTime(startAt);
         emit(
           state.copyWith(isLoading: false, target: SplashNavTarget.onboarding),
         );
@@ -46,12 +48,23 @@ class SplashCubit extends Cubit<SplashState> {
 
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
+        await _ensureMinimumSplashTime(startAt);
         emit(state.copyWith(isLoading: false, target: SplashNavTarget.home));
       } else {
+        await _ensureMinimumSplashTime(startAt);
         emit(state.copyWith(isLoading: false, target: SplashNavTarget.login));
       }
     } catch (_) {
+      await _ensureMinimumSplashTime(startAt);
       emit(state.copyWith(isLoading: false, target: SplashNavTarget.login));
+    }
+  }
+
+  Future<void> _ensureMinimumSplashTime(DateTime startAt) async {
+    const minimum = Duration(seconds: 3);
+    final elapsed = DateTime.now().difference(startAt);
+    if (elapsed < minimum) {
+      await Future.delayed(minimum - elapsed);
     }
   }
 }

@@ -161,4 +161,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**SmartLife** - Empowering productivity through AI-driven insights and comprehensive life management.# habit-expense-notes-app
+**SmartLife** - Empowering productivity through AI-driven insights and comprehensive life management.
+habit-expense-notes-app

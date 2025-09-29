@@ -140,26 +140,4 @@ Key dependencies include:
 - [ ] Widget support for home screen
 - [ ] Apple Watch companion app
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Flutter team for the amazing framework
-- Firebase for backend services
-- Google AI for Gemini integration
-- Open source community for various packages
-
----
-
-**SmartLife** - Empowering productivity through AI-driven insights and comprehensive life management.
-habit-expense-notes-app

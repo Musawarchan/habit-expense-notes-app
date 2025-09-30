@@ -9,7 +9,7 @@ import '../presentation/screens/expenses/expenses_screen.dart';
 import '../presentation/screens/notes/notes_screen.dart';
 import '../presentation/screens/ai/ai_screen.dart';
 import '../presentation/screens/settings/settings_screen.dart';
-import '../presentation/screens/settings/profile_edit_screen.dart';
+import '../presentation/screens/edit_profile/profile_edit_screen.dart';
 import '../presentation/screens/onboarding/onboarding_screen.dart';
 
 class AppPages {

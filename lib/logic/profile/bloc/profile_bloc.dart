@@ -12,6 +12,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<ProfileStarted>(_onStarted);
     on<ProfileUserChanged>(_onUserChanged);
     on<ProfileRequested>(_onRequested);
+    on<ProfileUpdateRequested>(_onUpdateRequested);
+    on<ProfilePhotoUpdateRequested>(_onPhotoUpdateRequested);
   }
 
   Future<void> _onStarted(
@@ -71,5 +73,46 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   Future<void> close() {
     _authSub?.cancel();
     return super.close();
+  }
+
+  Future<void> _onUpdateRequested(
+    ProfileUpdateRequested event,
+    Emitter<ProfileState> emit,
+  ) async {
+    // Only update if user is present
+    final current = state;
+    if (current is ProfileLoaded) {
+      emit(const ProfileLoading());
+      try {
+        await _repository.updateUserName(
+          userId: current.user.id,
+          name: event.name,
+        );
+        emit(const ProfileSaved());
+        final refreshed = await _repository.fetchUserById(current.user.id);
+        emit(ProfileLoaded(refreshed));
+      } catch (e) {
+        emit(ProfileError(e.toString()));
+      }
+    }
+  }
+
+  Future<void> _onPhotoUpdateRequested(
+    ProfilePhotoUpdateRequested event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final current = state;
+    if (current is ProfileLoaded) {
+      try {
+        await _repository.updatePhotoUrl(
+          userId: current.user.id,
+          photoUrl: event.photoUrl,
+        );
+        final refreshed = await _repository.fetchUserById(current.user.id);
+        emit(ProfileLoaded(refreshed));
+      } catch (e) {
+        emit(ProfileError(e.toString()));
+      }
+    }
   }
 }

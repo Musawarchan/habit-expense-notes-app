@@ -35,3 +35,7 @@ class ProfileError extends ProfileState {
   @override
   List<Object?> get props => [message];
 }
+
+class ProfileSaved extends ProfileState {
+  const ProfileSaved();
+}

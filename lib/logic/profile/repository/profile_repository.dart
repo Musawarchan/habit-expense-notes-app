@@ -20,4 +20,24 @@ class ProfileRepository {
     }
     return UserModel.fromJson(doc.data()!);
   }
+
+  Future<void> updateUserName({
+    required String userId,
+    required String name,
+  }) async {
+    await _firestore.collection('users').doc(userId).update({
+      'name': name,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> updatePhotoUrl({
+    required String userId,
+    required String photoUrl,
+  }) async {
+    await _firestore.collection('users').doc(userId).update({
+      'photoUrl': photoUrl,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
 }

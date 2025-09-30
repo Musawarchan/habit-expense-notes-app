@@ -22,3 +22,19 @@ class ProfileUserChanged extends ProfileEvent {
 class ProfileRequested extends ProfileEvent {
   const ProfileRequested();
 }
+
+class ProfileUpdateRequested extends ProfileEvent {
+  final String name;
+  const ProfileUpdateRequested(this.name);
+
+  @override
+  List<Object?> get props => [name];
+}
+
+class ProfilePhotoUpdateRequested extends ProfileEvent {
+  final String photoUrl;
+  const ProfilePhotoUpdateRequested(this.photoUrl);
+
+  @override
+  List<Object?> get props => [photoUrl];
+}

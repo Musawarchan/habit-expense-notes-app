@@ -119,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       CustomButton(
                         text: 'Edit Profile',
                         onPressed: () {
-                          // Edit profile for authenticated user
+                          context.go(AppPages.profileEdit);
                         },
                         isOutlined: true,
                       ),

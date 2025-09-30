@@ -9,6 +9,7 @@ import '../presentation/screens/expenses/expenses_screen.dart';
 import '../presentation/screens/notes/notes_screen.dart';
 import '../presentation/screens/ai/ai_screen.dart';
 import '../presentation/screens/settings/settings_screen.dart';
+import '../presentation/screens/settings/profile_edit_screen.dart';
 import '../presentation/screens/onboarding/onboarding_screen.dart';
 
 class AppPages {
@@ -25,6 +26,7 @@ class AppPages {
   static const String notes = '/notes';
   static const String ai = '/ai';
   static const String settings = '/settings';
+  static const String profileEdit = '/profile-edit';
   static const String onboarding = '/onboarding';
 
   // Page Widgets
@@ -38,5 +40,6 @@ class AppPages {
   static Widget notesPage() => const NotesScreen();
   static Widget aiPage() => const AiScreen();
   static Widget settingsPage() => const SettingsScreen();
+  static Widget profileEditPage() => const ProfileEditScreen();
   static Widget onboardingPage() => const OnboardingScreen();
 }

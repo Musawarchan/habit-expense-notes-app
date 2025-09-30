@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_strings.dart';
 
 class HabitsScreen extends StatelessWidget {
@@ -9,6 +10,13 @@ class HabitsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppStrings.habits),
+        leading: IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            // Add habit
+            context.pop();
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),

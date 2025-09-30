@@ -1,10 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-import '../models/user_model.dart';
 import '../repository/auth_repository.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -46,11 +44,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
       );
 
-      if (user != null) {
+      if (user != null && (user.uid).isNotEmpty) {
         final userModel = await _authRepository.getUserData(user.uid);
         emit(AuthAuthenticated(user: userModel));
       } else {
-        emit(const AuthUnauthenticated());
+        emit(const AuthError(message: 'Login failed. Please try again.'));
       }
     } catch (e) {
       emit(AuthError(message: e.toString()));
@@ -70,11 +68,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         name: event.name,
       );
 
-      if (user != null) {
+      if (user != null && (user.uid).isNotEmpty) {
         final userModel = await _authRepository.getUserData(user.uid);
         emit(AuthAuthenticated(user: userModel));
       } else {
-        emit(const AuthUnauthenticated());
+        emit(
+          const AuthError(message: 'Registration failed. Please try again.'),
+        );
       }
     } catch (e) {
       emit(AuthError(message: e.toString()));

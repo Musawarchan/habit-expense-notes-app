@@ -24,7 +24,8 @@ class AuthRepository {
         password: password,
       );
       final user = credential.user;
-      if (user != null) {
+      // Guard: Ensure a non-null user with a non-empty uid
+      if (user != null && (user.uid).isNotEmpty) {
         // Ensure user document exists
         final userRef = _firestore.collection('users').doc(user.uid);
         final snapshot = await userRef.get();
@@ -39,8 +40,10 @@ class AuthRepository {
             'preferences': {},
           });
         }
+        return user;
       }
-      return user;
+      // If Firebase returned no user, provide a consistent null result
+      return null;
     } on FirebaseAuthException catch (e) {
       throw Exception(_mapAuthError(e));
     } catch (e) {
@@ -59,10 +62,12 @@ class AuthRepository {
         password: password,
       );
 
-      if (credential.user != null) {
+      final user = credential.user;
+      // Guard: Ensure a non-null user with a non-empty uid
+      if (user != null && (user.uid).isNotEmpty) {
         // Create user document in Firestore
-        await _firestore.collection('users').doc(credential.user!.uid).set({
-          'id': credential.user!.uid,
+        await _firestore.collection('users').doc(user.uid).set({
+          'id': user.uid,
           'email': email,
           'name': name,
           'photoUrl': null,
@@ -70,9 +75,10 @@ class AuthRepository {
           'updatedAt': FieldValue.serverTimestamp(),
           'preferences': {},
         });
+        return user;
       }
-
-      return credential.user;
+      // If Firebase returned no user, provide a consistent null result
+      return null;
     } on FirebaseAuthException catch (e) {
       throw Exception(_mapAuthError(e));
     } catch (e) {

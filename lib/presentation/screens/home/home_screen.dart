@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/custom_widgets.dart';
+import '../../widgets/custom_widgets.dart';
 import '../../../../routes/app_pages.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -201,69 +201,6 @@ class _DashboardTabState extends State<DashboardTab> {
             ),
 
             const SizedBox(height: 24),
-
-            // Quick Actions
-            Text(
-              'Quick Actions',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _QuickActionCard(
-                    title: 'Add Habit',
-                    icon: Icons.add_circle,
-                    color: AppColors.habitColor,
-                    onTap: () {
-                      context.go(AppPages.habits);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _QuickActionCard(
-                    title: 'Add Task',
-                    icon: Icons.add_task,
-                    color: AppColors.taskColor,
-                    onTap: () {
-                      context.go(AppPages.tasks);
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _QuickActionCard(
-                    title: 'Add Expense',
-                    icon: Icons.add_business,
-                    color: AppColors.expenseColor,
-                    onTap: () {
-                      context.go(AppPages.expenses);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _QuickActionCard(
-                    title: 'AI Assistant',
-                    icon: Icons.psychology,
-                    color: AppColors.aiColor,
-                    onTap: () {
-                      context.go(AppPages.ai);
-                    },
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),

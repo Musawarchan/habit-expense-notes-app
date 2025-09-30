@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// shimmer is used directly in screens; no need to import here
 import '../../core/constants/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
@@ -180,6 +181,8 @@ class CustomCard extends StatelessWidget {
     );
   }
 }
+
+// Skeleton widget removed; use Shimmer.fromColors directly where needed
 
 class LoadingWidget extends StatelessWidget {
   final String? message;

@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../widgets/custom_widgets.dart';
 import '../../../../routes/app_pages.dart';
 import '../../../../logic/auth/bloc/auth_bloc.dart';
 import '../../../../logic/auth/bloc/auth_event.dart';
+// removed unused: auth_state
+import '../../../../logic/profile/bloc/profile_bloc.dart';
+import '../../../../logic/profile/bloc/profile_state.dart';
+import '../../../../logic/profile/bloc/profile_event.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -33,42 +38,150 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           // Profile Section
           CustomCard(
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: const Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'John Doe',
-                  style: Theme.of(
+            child: BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                if (state is ProfileLoading) {
+                  final base = Theme.of(
                     context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'john.doe@example.com',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                CustomButton(
-                  text: 'Edit Profile',
-                  onPressed: () {
-                    // Edit profile
-                  },
-                  isOutlined: true,
-                ),
-              ],
+                  ).colorScheme.surfaceVariant.withOpacity(0.3);
+                  final highlight = Theme.of(
+                    context,
+                  ).colorScheme.surface.withOpacity(0.6);
+                  return Shimmer.fromColors(
+                    baseColor: base,
+                    highlightColor: highlight,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: base,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          width: 140,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: base,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 180,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: base,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                if (state is ProfileLoaded) {
+                  final user = state.user;
+                  final displayName =
+                      (user.name == null || user.name!.trim().isEmpty)
+                      ? 'Unnamed User'
+                      : user.name!;
+                  return Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        child: const Icon(
+                          Icons.person,
+                          size: 40,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        displayName,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        user.email,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      CustomButton(
+                        text: 'Edit Profile',
+                        onPressed: () {
+                          // Edit profile for authenticated user
+                        },
+                        isOutlined: true,
+                      ),
+                    ],
+                  );
+                }
+                if (state is ProfileEmpty) {
+                  return Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        child: const Icon(
+                          Icons.person,
+                          size: 40,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Guest',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Not signed in',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      CustomButton(
+                        text: AppStrings.login,
+                        onPressed: () => context.go(AppPages.login),
+                        isOutlined: true,
+                      ),
+                    ],
+                  );
+                }
+                if (state is ProfileError) {
+                  return Column(
+                    children: [
+                      Text(
+                        'Failed to load profile',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      CustomButton(
+                        text: 'Retry',
+                        onPressed: () =>
+                            context.read<ProfileBloc>().add(ProfileRequested()),
+                        isOutlined: true,
+                      ),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
           ),
 

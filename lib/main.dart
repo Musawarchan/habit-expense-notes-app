@@ -14,6 +14,9 @@ import 'logic/auth/repository/auth_repository.dart';
 import 'logic/common/visibility_cubit.dart';
 import 'logic/auth/cubit/login_form_cubit.dart';
 import 'logic/auth/cubit/register_form_cubit.dart';
+import 'logic/profile/bloc/profile_bloc.dart';
+import 'logic/profile/repository/profile_repository.dart';
+import 'logic/profile/bloc/profile_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,14 +43,19 @@ class SmartLifeApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(authRepository: AuthRepository()),
-          // ..add(const AuthStarted()),
+          create: (context) =>
+              AuthBloc(authRepository: AuthRepository())
+                ..add(const AuthStarted()),
         ),
         BlocProvider<VisibilityCubit>(
           create: (_) => VisibilityCubit(initial: true),
         ),
         BlocProvider<LoginFormCubit>(create: (_) => LoginFormCubit()),
         BlocProvider<RegisterFormCubit>(create: (_) => RegisterFormCubit()),
+        BlocProvider<ProfileBloc>(
+          create: (_) =>
+              ProfileBloc(ProfileRepository())..add(const ProfileStarted()),
+        ),
       ],
       child: MaterialApp.router(
         title: AppStrings.appName,

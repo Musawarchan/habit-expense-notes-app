@@ -29,16 +29,32 @@ class AppRoutes {
         builder: (context, state) => AppPages.habitsPage(),
       ),
       GoRoute(
+        path: AppPages.addHabit,
+        builder: (context, state) => AppPages.addHabitPage(),
+      ),
+      GoRoute(
         path: AppPages.tasks,
         builder: (context, state) => AppPages.tasksPage(),
+      ),
+      GoRoute(
+        path: AppPages.addTask,
+        builder: (context, state) => AppPages.addTaskPage(),
       ),
       GoRoute(
         path: AppPages.expenses,
         builder: (context, state) => AppPages.expensesPage(),
       ),
       GoRoute(
+        path: AppPages.addExpense,
+        builder: (context, state) => AppPages.addExpensePage(),
+      ),
+      GoRoute(
         path: AppPages.notes,
         builder: (context, state) => AppPages.notesPage(),
+      ),
+      GoRoute(
+        path: AppPages.addNote,
+        builder: (context, state) => AppPages.addNotePage(),
       ),
       GoRoute(
         path: AppPages.ai,

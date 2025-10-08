@@ -11,6 +11,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../widgets/custom_widgets.dart';
 import '../../../../routes/app_pages.dart';
+import '../../../../core/services/dialog_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -65,13 +66,56 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.go(AppPages.ai);
-        },
-        child: const Icon(Icons.psychology),
-      ),
+      floatingActionButton: _getFloatingActionButton(context),
     );
+  }
+
+  /// Get the appropriate floating action button based on current tab
+  Widget _getFloatingActionButton(BuildContext context) {
+    switch (_currentIndex) {
+      case 0: // Dashboard
+        return FloatingActionButton(
+          onPressed: () {
+            context.go(AppPages.ai);
+          },
+          child: const Icon(Icons.psychology),
+        );
+      case 1: // Habits
+        return FloatingActionButton(
+          onPressed: () {
+            DialogService.showAddHabitDialog(context);
+          },
+          child: const Icon(Icons.add),
+        );
+      case 2: // Tasks
+        return FloatingActionButton(
+          onPressed: () {
+            DialogService.showAddTaskDialog(context);
+          },
+          child: const Icon(Icons.add),
+        );
+      case 3: // Expenses
+        return FloatingActionButton(
+          onPressed: () {
+            DialogService.showAddExpenseDialog(context);
+          },
+          child: const Icon(Icons.add),
+        );
+      case 4: // Notes
+        return FloatingActionButton(
+          onPressed: () {
+            DialogService.showAddNoteDialog(context);
+          },
+          child: const Icon(Icons.add),
+        );
+      default:
+        return FloatingActionButton(
+          onPressed: () {
+            context.go(AppPages.ai);
+          },
+          child: const Icon(Icons.psychology),
+        );
+    }
   }
 }
 

@@ -25,6 +25,9 @@ import 'logic/task/bloc/task_event.dart';
 import 'logic/expense/bloc/expense_bloc.dart';
 import 'logic/expense/repository/expense_repository.dart';
 import 'logic/expense/bloc/expense_event.dart';
+import 'logic/note/bloc/note_bloc.dart';
+import 'logic/note/repository/note_repository.dart';
+import 'logic/note/bloc/note_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -85,6 +88,13 @@ class SmartLifeApp extends StatelessWidget {
           create: (_) =>
               ExpenseBloc(expenseRepository: ExpenseRepository())
                 ..add(const ExpenseLoadRequested()),
+        ),
+
+        // Note Management
+        BlocProvider<NoteBloc>(
+          create: (_) =>
+              NoteBloc(noteRepository: NoteRepository())
+                ..add(const NoteLoadRequested()),
         ),
       ],
       child: MaterialApp.router(

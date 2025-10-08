@@ -3,6 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smartlife_app/presentation/screens/expenses/expenses_screen.dart';
+import 'package:smartlife_app/presentation/screens/habits/habits_screen.dart';
+import 'package:smartlife_app/presentation/screens/notes/notes_screen.dart';
+import 'package:smartlife_app/presentation/screens/tasks/tasks_screen.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../widgets/custom_widgets.dart';
@@ -20,10 +24,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     const DashboardTab(),
-    const HabitsTab(),
-    const TasksTab(),
-    const ExpensesTab(),
-    const NotesTab(),
+    const HabitsScreen(),
+    const TasksScreen(),
+    const ExpensesScreen(),
+    const NotesScreen(),
   ];
 
   @override
@@ -247,124 +251,36 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-class _QuickActionCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
+// class _QuickActionCard extends StatelessWidget {
+//   final String title;
+//   final IconData icon;
+//   final Color color;
+//   final VoidCallback onTap;
 
-  const _QuickActionCard({
-    required this.title,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
+//   const _QuickActionCard({
+//     required this.title,
+//     required this.icon,
+//     required this.color,
+//     required this.onTap,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return CustomCard(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Icon(icon, size: 32, color: color),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class HabitsTab extends StatelessWidget {
-  const HabitsTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.habits),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              // Add habit
-            },
-          ),
-        ],
-      ),
-      body: const Center(child: Text('Habits Tab - Coming Soon')),
-    );
-  }
-}
-
-class TasksTab extends StatelessWidget {
-  const TasksTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.tasks),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              // Add task
-            },
-          ),
-        ],
-      ),
-      body: const Center(child: Text('Tasks Tab - Coming Soon')),
-    );
-  }
-}
-
-class ExpensesTab extends StatelessWidget {
-  const ExpensesTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.expenses),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              // Add expense
-            },
-          ),
-        ],
-      ),
-      body: const Center(child: Text('Expenses Tab - Coming Soon')),
-    );
-  }
-}
-
-class NotesTab extends StatelessWidget {
-  const NotesTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.notes),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              // Add note
-            },
-          ),
-        ],
-      ),
-      body: const Center(child: Text('Notes Tab - Coming Soon')),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return CustomCard(
+//       onTap: onTap,
+//       child: Column(
+//         children: [
+//           Icon(icon, size: 32, color: color),
+//           const SizedBox(height: 8),
+//           Text(
+//             title,
+//             style: Theme.of(
+//               context,
+//             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+//             textAlign: TextAlign.center,
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

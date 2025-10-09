@@ -39,10 +39,10 @@ class _TasksScreenState extends State<TasksScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(AppStrings.tasks),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => context.pop(),
+        // ),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [

@@ -19,10 +19,7 @@ class HabitsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppStrings.habits),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),

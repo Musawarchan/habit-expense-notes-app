@@ -35,10 +35,10 @@ class ExpensesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppStrings.expenses),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => context.pop(),
+        // ),
         actions: [
           IconButton(
             icon: const Icon(Icons.analytics),

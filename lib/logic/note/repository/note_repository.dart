@@ -22,20 +22,45 @@ class NoteRepository {
   /// Returns real-time updates whenever notes change
   Stream<List<NoteModel>> getNotesStream() {
     if (_userId == null) {
-      print('NoteRepository: No user ID, returning empty stream');
       return Stream.value([]);
     }
 
-    print('NoteRepository: Setting up stream for user $_userId');
     return _notesCollection
         .where('userId', isEqualTo: _userId)
         .where('isArchived', isEqualTo: false)
         .orderBy('updatedAt', descending: true)
         .snapshots()
         .map((snapshot) {
-          print(
-            'NoteRepository: Stream update - ${snapshot.docs.length} documents',
-          );
+          final notes = snapshot.docs
+              .map(
+                (doc) => NoteModel.fromJson(doc.data() as Map<String, dynamic>),
+              )
+              .toList();
+
+          // Sort by pinned status in memory to avoid composite index requirement
+          notes.sort((a, b) {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            return 0;
+          });
+
+          return notes;
+        });
+  }
+
+  /// Stream of archived notes for the current user
+  /// Returns real-time updates whenever archived notes change
+  Stream<List<NoteModel>> getArchivedNotesStream() {
+    if (_userId == null) {
+      return Stream.value([]);
+    }
+
+    return _notesCollection
+        .where('userId', isEqualTo: _userId)
+        .where('isArchived', isEqualTo: true)
+        .orderBy('updatedAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
           final notes = snapshot.docs
               .map(
                 (doc) => NoteModel.fromJson(doc.data() as Map<String, dynamic>),

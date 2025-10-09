@@ -14,6 +14,11 @@ class NoteLoadRequested extends NoteEvent {
   const NoteLoadRequested();
 }
 
+/// Event to load archived notes
+class NoteLoadArchivedRequested extends NoteEvent {
+  const NoteLoadArchivedRequested();
+}
+
 /// Event to add a new note
 class NoteAddRequested extends NoteEvent {
   final NoteModel note;
@@ -112,11 +117,12 @@ class NoteFilterCleared extends NoteEvent {
 /// Event when notes list changes (from stream)
 class NoteListChanged extends NoteEvent {
   final List<NoteModel> notes;
+  final bool isArchived;
 
-  const NoteListChanged({required this.notes});
+  const NoteListChanged({required this.notes, this.isArchived = false});
 
   @override
-  List<Object?> get props => [notes];
+  List<Object?> get props => [notes, isArchived];
 }
 
 /// Event to refresh notes

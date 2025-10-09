@@ -15,15 +15,22 @@ class NotesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Load notes when screen initializes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authState = context.read<AuthBloc>().state;
-      if (authState is AuthAuthenticated) {
-        context.read<NoteBloc>().add(const NoteLoadRequested());
-      }
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      context.read<NoteBloc>().add(const NoteLoadRequested());
+    }
+    // });
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppStrings.notes),
+        title: BlocBuilder<NoteBloc, NoteState>(
+          builder: (context, state) {
+            if (state is NoteLoaded && state.isShowingArchived) {
+              return const Text('Archived Notes');
+            }
+            return Text(AppStrings.notes);
+          },
+        ),
         // leading: IconButton(
         //   icon: const Icon(Icons.arrow_back),
         //   onPressed: () => context.pop(),
@@ -36,6 +43,10 @@ class NotesScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: () => _showFilterDialog(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.archive),
+            onPressed: () => _toggleArchiveView(context),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -112,13 +123,16 @@ class NotesScreen extends StatelessWidget {
 
             if (state is NoteEmpty) {
               print('NotesScreen: Showing empty state');
-              return _buildEmptyState(context);
+              return _buildEmptyState(context, false);
             }
 
             if (state is NoteLoaded) {
               print(
                 'NotesScreen: Showing loaded state - ${state.notes.length} notes',
               );
+              if (state.notes.isEmpty) {
+                return _buildEmptyState(context, state.isShowingArchived);
+              }
               return _buildNotesList(context, state);
             }
 
@@ -134,28 +148,35 @@ class NotesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, bool isArchived) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.note, size: 64, color: Colors.grey),
+          Icon(
+            isArchived ? Icons.archive : Icons.note,
+            size: 64,
+            color: Colors.grey,
+          ),
           const SizedBox(height: 16),
-          const Text(
-            'No Notes Yet',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Text(
+            isArchived ? 'No Archived Notes' : 'No Notes Yet',
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Capture your thoughts and ideas',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
+          Text(
+            isArchived
+                ? 'Your archived notes will appear here'
+                : 'Capture your thoughts and ideas',
+            style: const TextStyle(fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () => DialogService.showAddNoteDialog(context),
-            icon: const Icon(Icons.add),
-            label: const Text('Add Your First Note'),
-          ),
+          if (!isArchived)
+            ElevatedButton.icon(
+              onPressed: () => DialogService.showAddNoteDialog(context),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Your First Note'),
+            ),
         ],
       ),
     );
@@ -348,37 +369,57 @@ class NotesScreen extends StatelessWidget {
                       ),
                       itemBuilder: (context) => [
                         PopupMenuItem(
-                          value: note.isPinned ? 'unpin' : 'pin',
+                          value: 'edit',
                           child: Row(
                             children: [
                               Icon(
-                                note.isPinned
-                                    ? Icons.push_pin_outlined
-                                    : Icons.push_pin,
-                                color: Colors.orange.shade600,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                note.isPinned ? 'Unpin' : 'Pin',
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'archive',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.archive,
-                                color: Colors.blue.shade600,
+                                Icons.edit,
+                                color: Colors.green.shade600,
                                 size: 18,
                               ),
                               const SizedBox(width: 12),
                               const Text(
-                                'Archive',
+                                'Edit',
                                 style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (!note.isArchived)
+                          PopupMenuItem(
+                            value: note.isPinned ? 'unpin' : 'pin',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  note.isPinned
+                                      ? Icons.push_pin_outlined
+                                      : Icons.push_pin,
+                                  color: Colors.orange.shade600,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  note.isPinned ? 'Unpin' : 'Pin',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ),
+                        PopupMenuItem(
+                          value: note.isArchived ? 'unarchive' : 'archive',
+                          child: Row(
+                            children: [
+                              Icon(
+                                note.isArchived
+                                    ? Icons.unarchive
+                                    : Icons.archive,
+                                color: Colors.blue.shade600,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                note.isArchived ? 'Unarchive' : 'Archive',
+                                style: const TextStyle(fontSize: 14),
                               ),
                             ],
                           ),
@@ -606,6 +647,9 @@ class NotesScreen extends StatelessWidget {
 
   void _handleNoteAction(BuildContext context, String action, NoteModel note) {
     switch (action) {
+      case 'edit':
+        _showEditNoteDialog(context, note);
+        break;
       case 'pin':
         context.read<NoteBloc>().add(NotePinRequested(noteId: note.id));
         break;
@@ -614,11 +658,128 @@ class NotesScreen extends StatelessWidget {
         break;
       case 'archive':
         context.read<NoteBloc>().add(NoteArchiveRequested(noteId: note.id));
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Note archived successfully'),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        break;
+      case 'unarchive':
+        context.read<NoteBloc>().add(NoteUnarchiveRequested(noteId: note.id));
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Note unarchived and moved to regular notes'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
         break;
       case 'delete':
         _showDeleteConfirmation(context, note);
         break;
     }
+  }
+
+  void _showEditNoteDialog(BuildContext context, NoteModel note) {
+    final titleController = TextEditingController(text: note.title);
+    final contentController = TextEditingController(text: note.content);
+    final tagsController = TextEditingController(text: note.tags.join(', '));
+
+    String selectedCategory = note.category;
+    final categories = ['Personal', 'Work', 'Ideas', 'Learning', 'Other'];
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Edit Note'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 1,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: contentController,
+                  decoration: const InputDecoration(
+                    labelText: 'Content',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 4,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: selectedCategory,
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: categories.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCategory = value!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: tagsController,
+                  decoration: const InputDecoration(
+                    labelText: 'Tags (comma separated)',
+                    border: OutlineInputBorder(),
+                    hintText: 'e.g., important, meeting, project',
+                  ),
+                  maxLines: 1,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final updatedNote = note.copyWith(
+                  title: titleController.text.trim(),
+                  content: contentController.text.trim(),
+                  category: selectedCategory,
+                  tags: tagsController.text
+                      .split(',')
+                      .map((tag) => tag.trim())
+                      .where((tag) => tag.isNotEmpty)
+                      .toList(),
+                  updatedAt: DateTime.now(),
+                );
+
+                context.read<NoteBloc>().add(
+                  NoteUpdateRequested(note: updatedNote),
+                );
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showDeleteConfirmation(BuildContext context, NoteModel note) {
@@ -733,6 +894,59 @@ class NotesScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _toggleArchiveView(BuildContext context) {
+    final currentState = context.read<NoteBloc>().state;
+    bool isShowingArchived = false;
+
+    if (currentState is NoteLoaded) {
+      isShowingArchived = currentState.isShowingArchived;
+    }
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Archive Options'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(
+                isShowingArchived ? Icons.note : Icons.archive,
+                color: isShowingArchived ? Colors.blue : Colors.orange,
+              ),
+              title: Text(
+                isShowingArchived
+                    ? 'View Regular Notes'
+                    : 'View Archived Notes',
+              ),
+              subtitle: Text(
+                isShowingArchived
+                    ? 'Switch back to regular notes'
+                    : 'View your archived notes',
+              ),
+              onTap: () {
+                Navigator.pop(dialogContext);
+                if (isShowingArchived) {
+                  context.read<NoteBloc>().add(const NoteLoadRequested());
+                } else {
+                  context.read<NoteBloc>().add(
+                    const NoteLoadArchivedRequested(),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+        ],
       ),
     );
   }

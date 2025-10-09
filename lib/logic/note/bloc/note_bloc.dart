@@ -16,6 +16,7 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
       super(const NoteInitial()) {
     // Register event handlers
     on<NoteLoadRequested>(_onLoadRequested);
+    on<NoteLoadArchivedRequested>(_onLoadArchivedRequested);
     on<NoteAddRequested>(_onAddRequested);
     on<NoteUpdateRequested>(_onUpdateRequested);
     on<NoteDeleteRequested>(_onDeleteRequested);
@@ -44,7 +45,28 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
 
       // Subscribe to notes stream
       _notesSubscription = _noteRepository.getNotesStream().listen(
-        (notes) => add(NoteListChanged(notes: notes)),
+        (notes) => add(NoteListChanged(notes: notes, isArchived: false)),
+      );
+    } catch (e) {
+      emit(NoteError(message: e.toString()));
+    }
+  }
+
+  /// Handle archived notes load request
+  /// Sets up real-time listener for archived note changes
+  Future<void> _onLoadArchivedRequested(
+    NoteLoadArchivedRequested event,
+    Emitter<NoteState> emit,
+  ) async {
+    try {
+      emit(const NoteLoading());
+
+      // Cancel existing subscription if any
+      await _notesSubscription?.cancel();
+
+      // Subscribe to archived notes stream
+      _notesSubscription = _noteRepository.getArchivedNotesStream().listen(
+        (notes) => add(NoteListChanged(notes: notes, isArchived: true)),
       );
     } catch (e) {
       emit(NoteError(message: e.toString()));
@@ -113,7 +135,8 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
   ) async {
     try {
       await _noteRepository.unarchiveNote(event.noteId);
-      // Don't emit success - the stream will automatically update
+      // Switch back to regular notes view after unarchiving
+      add(const NoteLoadRequested());
     } catch (e) {
       emit(NoteError(message: 'Failed to unarchive note: ${e.toString()}'));
     }
@@ -242,6 +265,7 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
             regularNotes: regularNotes,
             totalNotes: event.notes.length,
             pinnedCount: pinnedNotes.length,
+            isShowingArchived: event.isArchived,
           ),
         );
       }
@@ -255,6 +279,16 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
   ) async {
     // Reload all notes
     add(const NoteLoadRequested());
+  }
+
+  /// Refresh current view (regular or archived)
+  void refreshCurrentView() {
+    final currentState = state;
+    if (currentState is NoteLoaded && currentState.isShowingArchived) {
+      add(const NoteLoadArchivedRequested());
+    } else {
+      add(const NoteLoadRequested());
+    }
   }
 
   @override

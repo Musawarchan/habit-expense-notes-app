@@ -43,6 +43,7 @@ class NoteLoaded extends NoteState {
   final String? filterCategory;
   final int totalNotes;
   final int pinnedCount;
+  final bool isShowingArchived;
 
   const NoteLoaded({
     required this.notes,
@@ -52,6 +53,7 @@ class NoteLoaded extends NoteState {
     this.filterCategory,
     required this.totalNotes,
     required this.pinnedCount,
+    this.isShowingArchived = false,
   });
 
   @override
@@ -63,6 +65,7 @@ class NoteLoaded extends NoteState {
     filterCategory,
     totalNotes,
     pinnedCount,
+    isShowingArchived,
   ];
 
   /// Check if notes are being filtered
